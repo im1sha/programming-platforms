@@ -7,9 +7,6 @@ using System.Threading.Tasks;
 
 namespace TaskQueue
 {
-    // Represents a callback method to be executed by a TaskQueue thread.
-    public delegate void TaskDelegate();
-
     public class TaskQueue
     {
         // Fields and properties section
@@ -25,7 +22,7 @@ namespace TaskQueue
         public int ManagementInterval { get; private set; } = 100;
 
         // Queue of methods TaskQueue instance should process
-        private Queue<TaskDelegate> WorkQueue = new Queue<TaskDelegate>();
+        private Queue<UnitOfWork> WorkQueue = new Queue<UnitOfWork>();
 
         public int QueueLength
         {
@@ -140,7 +137,7 @@ namespace TaskQueue
 
         // Queues a method for execution. 
         // The method executes when a TaskQueue thread becomes available
-        public void EnqueueTask(TaskDelegate task)
+        public void EnqueueTask(UnitOfWork task)
         {
             lock (WorkQueue)
             {

@@ -13,7 +13,7 @@ namespace TaskQueue
 
 
         // Link to queue from TaskQueue class
-        private Queue<TaskDelegate> WorkQueue = null;
+        private Queue<UnitOfWork> WorkQueue = null;
 
         // Current process
         private Thread WorkProcess = null;
@@ -31,7 +31,7 @@ namespace TaskQueue
         // constructs section
 
 
-        public WorkTask(ref Queue<TaskDelegate> WorkQueue)
+        public WorkTask(ref Queue<UnitOfWork> WorkQueue)
         {
             this.WorkQueue = WorkQueue;
             WorkProcess = new Thread(new ThreadStart(ExecutePassedMethod));
@@ -100,7 +100,7 @@ namespace TaskQueue
         // Executes task belongs to queue of all the passed to TaskQueue delegates
         private void ExecutePassedMethod()
         {
-            TaskDelegate del;
+            UnitOfWork u;
 
             while (KeepRunning)
             {
@@ -108,18 +108,18 @@ namespace TaskQueue
                 {
                     while (WorkQueue.Count > 0)
                     {
-                        del = null;
+                        u = null;
 
                         lock (WorkQueue)
                         {
-                            del = WorkQueue.Dequeue();
+                            u = WorkQueue.Dequeue();
                         }
 
-                        if (del != null)
+                        if (u != null && u.Task != null)
                         {
                             LastOperation = DateTime.Now;
                             Busy = true;
-                            del();
+                            u.Task(u.Obj);
                         }
                     }
 
