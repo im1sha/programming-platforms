@@ -12,13 +12,13 @@ namespace TaskQueue
         // Fields and properties section
 
 
-        // link to queue from TaskQueue class
+        // Link to queue from TaskQueue class
         private Queue<TaskDelegate> WorkQueue = null;
 
-        // current process
+        // Current process
         private Thread WorkProcess = null;
 
-        // determine whether the thread should continue running
+        // Determine whether the thread should continue running
         private bool KeepRunning = true;
 
         public bool Busy { get; private set; } = false;
@@ -56,6 +56,7 @@ namespace TaskQueue
         // public methods
 
 
+        // Sets interval between checking for not processed tasks
         public bool SetManagementInterval(int millisecondsTimeout)
         {
             bool result = false;
@@ -67,6 +68,7 @@ namespace TaskQueue
             return result;
         }
 
+        // Destroys executed task
         internal void Close()
         {
             KeepRunning = false;
@@ -81,6 +83,7 @@ namespace TaskQueue
             }        
         }
 
+        // Interupts idling thread
         internal void WakeUp()
         {
             if (WorkProcess.ThreadState == ThreadState.WaitSleepJoin)
@@ -94,6 +97,7 @@ namespace TaskQueue
         // private methods
 
 
+        // Executes task belongs to queue of all the passed to TaskQueue delegates
         private void ExecutePassedMethod()
         {
             TaskDelegate del;

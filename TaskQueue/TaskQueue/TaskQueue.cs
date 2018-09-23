@@ -15,14 +15,16 @@ namespace TaskQueue
         // Fields and properties section
 
 
-        public int MinThreads { get; private set; }
+        public int MinThreads { get; private set; } = 0;
 
-        public int MaxThreads { get; private set; }
+        public int MaxThreads { get; private set; } = 0;
 
-        public int MaxIdleTime { get; private set; } = 5;
+        public int MaxIdleTime { get; private set; } = 10;
 
+        // Determines interval between calls of management thread
         public int ManagementInterval { get; private set; } = 100;
 
+        // Queue of methods TaskQueue instance should process
         private Queue<TaskDelegate> WorkQueue = new Queue<TaskDelegate>();
 
         public int QueueLength
@@ -33,6 +35,7 @@ namespace TaskQueue
             }
         }
 
+        // Running tasks 
         private List<WorkTask> TaskList = new List<WorkTask>();
 
         private Thread ManagementThread = null;
@@ -45,18 +48,18 @@ namespace TaskQueue
 
         public TaskQueue(int MaxWorkerThreads) : this()
         {
-            MaxThreads = MaxWorkerThreads;
+            SetMaxThreads(MaxWorkerThreads);
         }
 
         private TaskQueue()
         {
             ThreadPool.GetMinThreads(out int MinThreadsAvailable, out int MinPortsAvailable);         
             MinThreads = MinThreadsAvailable;
-            if (MinThreads > MaxThreads)
+            if (MaxThreads == 0)
             {
                 MaxThreads = MinThreads;
             }
-
+           
             ManagementThread = new Thread(new ThreadStart(KeepManagement));
             ManagementThread.Start();
         }
@@ -81,7 +84,7 @@ namespace TaskQueue
         public bool SetMaxThreads(int workerThreads)
         {
             bool result = false;
-            if (workerThreads >= MinThreads)
+            if (workerThreads >= 1)
             {
                 ThreadPool.GetMaxThreads(out int maxThreadsAvailable, out int maxPortsAvailable);
                 if (maxThreadsAvailable >= workerThreads)
@@ -98,7 +101,8 @@ namespace TaskQueue
         public bool SetMinTreads(int workerThreads)
         {
             bool result = false;
-            if (workerThreads <= MaxThreads)
+            ThreadPool.GetMaxThreads(out int maxThreadsAvailable, out int maxPortsAvailable);
+            if (workerThreads <= maxThreadsAvailable)
             {
                 ThreadPool.GetMinThreads(out int minThreadsAvailable, out int minPortsAvailable);
                 if (minThreadsAvailable <= workerThreads)
@@ -110,6 +114,7 @@ namespace TaskQueue
             return result;
         }
 
+        // Sets interval between calls of management thread
         public bool SetManagementInterval(int millisecondsTimeout)
         {
             bool result = false;
@@ -121,6 +126,7 @@ namespace TaskQueue
             return result;
         }
 
+        // Sets max time thread's allowed to be in state of Wait, Sleep or Join
         public bool SetMaxIdleTime(int seconds)
         {
             bool result = false;
@@ -165,6 +171,7 @@ namespace TaskQueue
             }
         }
 
+        // Destroys TaskQueue instance, running tasks and management thread
         public void Close()
         {
             KeepManagementThreadRunning = false;
@@ -190,6 +197,7 @@ namespace TaskQueue
         // Private methods section
 
 
+        // Keeps tracking of threads that are running more than MaxIdleTime
         private void KeepManagement()
         {
             while (KeepManagementThreadRunning)
