@@ -21,7 +21,7 @@ namespace TaskQueue
 
         public int MaxIdleTime { get; private set; } = 5;
 
-        public int ManagementInterval { get; private set; } = 1000;
+        public int ManagementInterval { get; private set; } = 100;
 
         private Queue<TaskDelegate> WorkQueue = new Queue<TaskDelegate>();
 
@@ -43,9 +43,9 @@ namespace TaskQueue
         // Constructors and deconstructors section
 
 
-        public TaskQueue(int maxWorkerThreads) : this()
+        public TaskQueue(int MaxWorkerThreads) : this()
         {
-            MaxThreads = maxWorkerThreads;
+            MaxThreads = MaxWorkerThreads;
         }
 
         private TaskQueue()
@@ -63,21 +63,7 @@ namespace TaskQueue
       
         ~TaskQueue()
         {
-            KeepManagementThreadRunning = false;
-
-            if (ManagementThread != null)
-            {
-                if (ManagementThread.ThreadState == ThreadState.WaitSleepJoin)
-                {
-                    ManagementThread.Interrupt();
-                }
-                ManagementThread.Join();
-            }
-
-            foreach (WorkTask task in TaskList)
-            {
-                task.Close();
-            }
+            Close();
         }
 
 
@@ -129,7 +115,7 @@ namespace TaskQueue
             bool result = false;
             if (millisecondsTimeout > 0)
             {
-                MaxIdleTime = millisecondsTimeout;
+                ManagementInterval = millisecondsTimeout;
                 result = true;
             };
             return result;
@@ -179,6 +165,27 @@ namespace TaskQueue
             }
         }
 
+        public void Close()
+        {
+            KeepManagementThreadRunning = false;
+
+            if (ManagementThread != null)
+            {
+                if (ManagementThread.ThreadState == ThreadState.WaitSleepJoin)
+                {
+                    ManagementThread.Interrupt();
+                }
+                ManagementThread.Join();
+            }
+
+            ManagementThread = null;
+
+            foreach (WorkTask task in TaskList)
+            {
+                task.Close();
+            }
+        }
+
 
         // Private methods section
 
@@ -204,13 +211,7 @@ namespace TaskQueue
                             }
                         }
                     }
-                }
-                catch
-                {
-                }
 
-                try
-                {
                     Thread.Sleep(ManagementInterval);
                 }
                 catch
