@@ -3,89 +3,89 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TaskQueue
 {
     public class FileManager
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// TaskQueue of performing operations under files
+        /// </summary>
+        private TaskQueue WorkQueue;
+
+
+        public FileManager(TaskQueue WorkQueue)
         {
-            //if (args.Length != 2)
-            //{
-            //    Console.WriteLine("wrong parameters");
-            //    return;
-            //}
-
-            const int queueAmount = 100;
-            TaskQueue T = new TaskQueue(queueAmount);
-            UnitOfWork u = new UnitOfWork(DoWork, null);
-
-            for (int i = 0; i < queueAmount; i++)
-            {
-                T.EnqueueTask(u);
-            }
-
-            T.Close();
-
-            Console.WriteLine("press any key");
-            Console.ReadLine();
+            this.WorkQueue = WorkQueue;
         }
 
-        //public static void Main()
-        //{
-        //    // Copy from the current directory, include subdirectories
-        //    DirectoryCopy(@"C:\Users\Foxx\Desktop\abc", @"C:\Users\Foxx\Desktop\xdd", true);
-        //}
 
-        //private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
-        //{
-        //    // Get the subdirectories for the specified directory
-        //    DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-        //    if (!dir.Exists)
-        //    {
-        //        throw new DirectoryNotFoundException(
-        //            "Source directory does not exist or could not be found: "
-        //            + sourceDirName);
-        //    }
-        //    DirectoryInfo[] dirs = dir.GetDirectories();
-
-        //    // If the destination directory doesn't exist, create it
-        //    if (!Directory.Exists(destDirName))
-        //    {
-        //        Directory.CreateDirectory(destDirName);
-        //    }
-
-        //    // Get the files in the directory and copy them to the new location
-        //    FileInfo[] files = dir.GetFiles();
-        //    foreach (FileInfo file in files)
-        //    {
-        //        string temppath = Path.Combine(destDirName, file.Name);
-        //        file.CopyTo(temppath, false);
-        //    }
-
-        //    // If copying subdirectories, copy them and their contents to new location
-        //    if (copySubDirs)
-        //    {
-        //        foreach (DirectoryInfo subdir in dirs)
-        //        {
-        //            string temppath = Path.Combine(destDirName, subdir.Name);
-        //            DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-        //        }
-        //    }
-        //}
-
-        private static void DoWork(object o)
+        /// <summary>
+        /// Copies directory with subfolders or without 
+        /// </summary>
+        /// <param name="sourceDirName">Source folder</param>
+        /// <param name="destDirName">Destination folder</param>
+        /// <param name="copySubDirs">Should copy subfolders</param>
+        /// <param name="overwrite">Overwrite existing files with identical names</param>
+        public void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs, bool overwrite)
         {
-            Console.WriteLine("started");
-            var rand = new Random();
-            int total = rand.Next(100000);
-            int val = 1;
-            for (int j = 0; j < total; j++)
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            if (!dir.Exists)
             {
-                val *= 2;
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
             }
-            Console.WriteLine("ended");
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string newPath = Path.Combine(destDirName, file.Name);
+
+                if (WorkQueue == null)
+                {
+                    ThreadPool.GetMinThreads(out int minThreads, out int minPorts);
+                    WorkQueue = new TaskQueue(minThreads);
+                }
+
+                var unitOfWork = new UnitOfWork(CopyFile, new object[] { file, newPath, overwrite });
+                WorkQueue.EnqueueTask(unitOfWork);
+            }
+
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs, overwrite);
+                }
+            }          
+        }
+
+        /// <summary>
+        /// Copies file using data
+        /// </summary>
+        /// <param name="o">Represents data required to copy file as following 
+        /// object[] { File file, string newPath, bool overwrite } where 
+        /// file is source file, 
+        /// newPath is new path to file</param>
+        private void CopyFile(object o)
+        {
+            object[] args = (object[])o;
+
+            FileInfo file = (FileInfo)args[0];
+            string newPath = (string)args[1];
+            bool overwrite = (bool)args[2];
+
+            file.CopyTo(newPath, overwrite);
         }
     }
 }
