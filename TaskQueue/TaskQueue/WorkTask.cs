@@ -34,7 +34,7 @@ namespace TaskQueue
         public WorkTask(ref Queue<UnitOfWork> WorkQueue)
         {
             this.WorkQueue = WorkQueue;
-            WorkProcess = new Thread(new ThreadStart(ExecutePassedMethod));
+            WorkProcess = new Thread(ExecutePassedMethod);
             WorkProcess.Start();
         }
 
