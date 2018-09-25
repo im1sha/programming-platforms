@@ -10,26 +10,40 @@ namespace AssemblyViewer
 {
     class Program
     {
+        /// <summary>
+        /// Entry point of the application 
+        /// </summary>
+        /// <param name="args">Full path to .dll or .exe file should be passed</param>
         static void Main(string[] args)
         {
-            string dllName = "ClassLibrary.dll";
-            string currentDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string dllPath = Path.Combine(currentDir, dllName);
+            if (args.Length != 1)
+            {
+                throw new Exception("Wrong parameters");
+            }
 
-            if (!File.Exists(dllPath))
+            string libPath = args[0];
+
+            if (!File.Exists(libPath))
             {
                 throw new Exception("File doesn't exist");
             }
 
-            PrintClasses(dllPath);
+            List<string> classInfo = SortLib(libPath);
+
+            foreach (string item in classInfo)
+            {
+                Console.WriteLine(item);
+            }
         }
 
+
         /// <summary>
-        /// Observes library to find all public types and 
-        /// prints them all using cort by namespace and then by class name
+        ///  Observes library to find all public types and 
+        ///  sorts them all by namespace and then by class name
         /// </summary>
         /// <param name="dllPath">Library that are used</param>
-        public static void PrintClasses(string dllPath)
+        /// <returns>Sorted class list</returns>
+        public static List<string> SortLib(string dllPath)
         {
             Assembly assembly = Assembly.LoadFrom(dllPath);
                            
@@ -38,17 +52,13 @@ namespace AssemblyViewer
 
             List<string> classInfo = new List<string>();
 
-            foreach (var item in requiredTypes)
+            foreach (Type t in requiredTypes)
             {
-                classInfo.Add(item.FullName);
+                classInfo.Add(t.FullName);
             }
-
             classInfo.Sort((s1, s2) => string.Compare(s1, s2));
 
-            foreach (var item in classInfo)
-            {
-                Console.WriteLine(item);
-            }                  
+            return classInfo;
         }      
     }
 }
