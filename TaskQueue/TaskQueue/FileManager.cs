@@ -80,7 +80,7 @@ namespace TaskQueue
         }
 
         /// <summary>
-        /// Copies file using data
+        /// Copies file as specified in the parameter
         /// </summary>
         /// <param name="o">Represents data required to copy file as following 
         /// ValueTuple<FileInfo, string, bool, Counter> where 
