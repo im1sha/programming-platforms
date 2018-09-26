@@ -12,13 +12,19 @@ namespace TaskQueue
         // Fields and properties section
 
 
-        // Link to queue from TaskQueue class
+        /// <summary>
+        /// Link to queue from TaskQueue class
+        /// </summary>
         private Queue<UnitOfWork> WorkQueue = null;
 
-        // Current process
+        /// <summary>
+        /// Current process
+        /// </summary>
         private Thread WorkProcess = null;
 
-        // Determine whether the thread should continue running
+        /// <summary>
+        /// Determines whether the thread should continue running
+        /// </summary>
         private bool KeepRunning = true;
 
         public bool Busy { get; private set; } = false;
@@ -56,7 +62,11 @@ namespace TaskQueue
         // public methods
 
 
-        // Sets interval between checking for not processed tasks
+        /// <summary>
+        /// Sets interval between checking for not processed tasks
+        /// </summary>
+        /// <param name="millisecondsTimeout">Desired interval between calls of management method</param>
+        /// <returns>Operation success</returns>
         public bool SetManagementInterval(int millisecondsTimeout)
         {
             bool result = false;
@@ -68,7 +78,9 @@ namespace TaskQueue
             return result;
         }
 
-        // Destroys executed task
+        /// <summary>
+        /// Destroys executed task
+        /// </summary>
         internal void Close()
         {
             KeepRunning = false;
@@ -83,7 +95,9 @@ namespace TaskQueue
             }        
         }
 
-        // Interupts idling thread
+        /// <summary>
+        /// Interupts idling thread
+        /// </summary>
         internal void WakeUp()
         {
             if (WorkProcess.ThreadState == ThreadState.WaitSleepJoin)
@@ -97,7 +111,9 @@ namespace TaskQueue
         // private methods
 
 
-        // Executes task belongs to queue of all the passed to TaskQueue delegates
+        /// <summary>
+        /// Executes task belongs to queue of all the passed to TaskQueue delegates
+        /// </summary>
         private void ExecutePassedMethod()
         {
             UnitOfWork u;

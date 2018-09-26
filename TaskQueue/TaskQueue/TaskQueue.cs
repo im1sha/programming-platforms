@@ -16,14 +16,21 @@ namespace TaskQueue
 
         public int MaxThreads { get; private set; } = 0;
 
-        public int MaxIdleTime { get; private set; } = 10;
+        public int MaxIdleTime { get; private set; } = 100;
 
-        // Determines interval between calls of management thread
+        /// <summary>
+        /// Interval between calls of management thread
+        /// </summary>
         public int ManagementInterval { get; private set; } = 100;
 
-        // Queue of methods TaskQueue instance should process
+        /// <summary>
+        /// Queue of methods TaskQueue instance should process
+        /// </summary>
         private Queue<UnitOfWork> WorkQueue = new Queue<UnitOfWork>();
 
+        /// <summary>
+        /// Not processed methods number 
+        /// </summary>
         public int QueueLength
         {
             get
@@ -32,7 +39,9 @@ namespace TaskQueue
             }
         }
 
-        // Running tasks 
+        /// <summary>
+        /// Running tasks that execute methods passed by EnqueueTask  
+        /// </summary>
         private List<WorkTask> TaskList = new List<WorkTask>();
 
         private Thread ManagementThread = null;
@@ -70,14 +79,21 @@ namespace TaskQueue
         // Public methods section
 
 
-        // Retrieves the difference between the maximum number of TaskQueue threads 
-        // and the number currently active
+        /// <summary>
+        /// Retrieves the difference between the maximum number of TaskQueue threads
+        /// and the number currently active
+        /// </summary>
+        /// <returns>Available threads number</returns>
         public int GetAvailableThreads()
         {
             return MaxThreads - TaskList.Count;
         }
 
-        // Sets the number of requests to the TaskQueue that can be active concurrently.
+        /// <summary>
+        /// Sets the number of requests to the TaskQueue that can be active concurrently
+        /// </summary>
+        /// <param name="workerThreads">Desired number of threads</param>
+        /// <returns>Operation success</returns>
         public bool SetMaxThreads(int workerThreads)
         {
             bool result = false;
@@ -93,8 +109,12 @@ namespace TaskQueue
             return result;
         }
 
-        // Sets the minimum number of threads the TaskQueue creates on demand, as new requests are made, 
-        // before switching to an algorithm for managing thread creation and destruction
+        /// <summary>
+        /// Sets the minimum number of threads the TaskQueue creates on demand, as new requests are made, 
+        /// before switching to an algorithm for managing thread creation and destruction
+        /// </summary>
+        /// <param name="workerThreads">Desired number of threads</param>
+        /// <returns>Operation success</returns>
         public bool SetMinTreads(int workerThreads)
         {
             bool result = false;
@@ -111,7 +131,11 @@ namespace TaskQueue
             return result;
         }
 
-        // Sets interval between calls of management thread
+        /// <summary>
+        /// Sets interval between calls of management thread
+        /// </summary>
+        /// <param name="millisecondsTimeout">Desired management interval</param>
+        /// <returns>Operation success</returns>
         public bool SetManagementInterval(int millisecondsTimeout)
         {
             bool result = false;
@@ -123,7 +147,11 @@ namespace TaskQueue
             return result;
         }
 
-        // Sets max time thread's allowed to be in state of Wait, Sleep or Join
+        /// <summary>
+        /// Sets max time thread's allowed to be in state of Wait, Sleep or Join
+        /// </summary>
+        /// <param name="seconds">Max time thread allowed to be alive</param>
+        /// <returns>Operation success</returns>
         public bool SetMaxIdleTime(int seconds)
         {
             bool result = false;
@@ -135,8 +163,11 @@ namespace TaskQueue
             return result;
         }
 
-        // Queues a method for execution. 
-        // The method executes when a TaskQueue thread becomes available
+        /// <summary>
+        /// Queues a method for execution. 
+        /// The method executes when a TaskQueue thread becomes available 
+        /// </summary>
+        /// <param name="task">Enqueued task to execution</param>
         public void EnqueueTask(UnitOfWork task)
         {
             lock (WorkQueue)
@@ -168,7 +199,9 @@ namespace TaskQueue
             }
         }
 
-        // Destroys TaskQueue instance, running tasks and management thread
+        /// <summary>
+        /// Destroys TaskQueue instance, running tasks and management thread
+        /// </summary>
         public void Close()
         {
             KeepManagementThreadRunning = false;
@@ -194,7 +227,9 @@ namespace TaskQueue
         // Private methods section
 
 
-        // Keeps tracking of threads that are running more than MaxIdleTime
+        /// <summary>
+        /// Keeps tracking of threads that are running more than MaxIdleTime
+        /// </summary>
         private void KeepManagement()
         {
             while (KeepManagementThreadRunning)
