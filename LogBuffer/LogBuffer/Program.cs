@@ -10,6 +10,8 @@ namespace LogBuffer
     {
         static void Main(string[] args)
         {
+            
         }
     }
 }
+

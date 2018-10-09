@@ -18,43 +18,63 @@ namespace LogBuffer
         /// <summary>
         /// File that stores messages
         /// </summary>
-        private string FilePath;
+        private string StorageFile;
 
         /// <summary>
         /// Time between writes on hard drive 
         /// </summary>
-        private int ReleaseTime;
+        private double ReleaseTime;
 
         /// <summary>
         /// Buffer capacity 
         /// </summary>
         private int BufferSize;
 
+        private readonly double DefaultReleaseTimeInSeconds = 10;
+
+        private readonly int DefaultBufferSize = 50;
+
         /// <summary>
         /// Creates imnstance of LogBuffer class
         /// </summary>
-        /// <param name="MaxBufferSize">Buffer capacity</param>
+        /// <param name="BufferSize">Buffer capacity</param>
         /// <param name="ReleaseTime">Time between writes can't exceed this value</param>
-        public LogBuffer(int MaxBufferSize, int ReleaseTime)
+        public LogBuffer(int BufferSize, double ReleaseTime, string StorageFile)
         {
-
+            if (BufferSize > 0)
+            {
+                this.BufferSize = BufferSize;
+            }
+            if (ReleaseTime > 0)
+            {
+                this.ReleaseTime = ReleaseTime;
+            }
+            this.StorageFile = StorageFile;
         }
 
         /// <summary>
         /// Appends string to buffer
         /// </summary>
-        /// <param name="item">message ot add</param>
-        public void Add(string item)
+        /// <param name="Item">Message ot add</param>
+        public void Add(string Item)
         {
-            throw new NotImplementedException();
+            Buffer.Add(Item);
+            if (BufferSize <= Buffer.Count)
+            {
+                AsyncWrite(Buffer, StorageFile);
+            }
         }
 
         /// <summary>
         /// Writes messages from list to file asynchronously
         /// </summary>
-        /// <param name="list">List with messages</param>
-        private void AsyncWrite(List<string> list)
+        /// <param name="MessageList">List with messages</param>
+        private void AsyncWrite(List<string> MessageList, string StorageFile)
         {
+            if (!File.Exists(StorageFile))
+            {
+                File.Create(StorageFile);
+            }
             throw new NotImplementedException();
         }
     }
