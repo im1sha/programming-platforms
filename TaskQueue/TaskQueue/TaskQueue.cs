@@ -79,6 +79,11 @@ namespace TaskQueue
         // Public methods section
 
 
+        void Sum()
+        {
+            Console.WriteLine(DateTime.Now);
+        }
+
         /// <summary>
         /// Retrieves the difference between the maximum number of TaskQueue threads
         /// and the number currently active
