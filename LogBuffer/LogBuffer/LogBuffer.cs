@@ -8,13 +8,32 @@ using System.Threading.Tasks;
 
 namespace LogBuffer
 {
-    class LogBuffer
+    class LogBuffer:IDisposable
     {
         /// <summary>
         /// List of messages that should be added 
         /// to file on hard drive
         /// </summary>
         private List<string> Buffer = new List<string>();
+        
+        /// <summary>
+        /// Appended message to buffer
+        /// </summary>
+        private string AppendedMessage
+        {
+            set
+            {
+                lock (Buffer)
+                {
+                    Buffer.Add(value);
+                }
+                
+                if (Buffer.Count == BufferSize)
+                {
+                    WriteMessagesAsync();
+                }
+            }
+        }
 
         /// <summary>
         /// File that stores messages
@@ -35,9 +54,8 @@ namespace LogBuffer
 
         private readonly int DefaultBufferSize = 50;
 
-        CancellationTokenSource TokenSource = new CancellationTokenSource();
-
-        CancellationToken Token;
+        //CancellationTokenSource WriteTokenSource = new CancellationTokenSource();
+        //CancellationToken WriteToken;
 
         /// <summary>
         /// Creates imnstance of LogBuffer class
@@ -50,22 +68,25 @@ namespace LogBuffer
             this.BufferSize = (BufferSize > 0) ? BufferSize : DefaultBufferSize;
             this.ReleaseTime = (ReleaseTime > 0) ? ReleaseTime : DefaultReleaseTimeInSeconds;           
             this.StorageFile = StorageFile;
-            Token = TokenSource.Token;
-            Task backgroundWrite = new Task(BackgroundWrite, Token);
+            //WriteToken = WriteTokenSource.Token;
+
+
+            //Thread thready = new Thread(BackgroundPeriodicWrite);
+            //thready.IsBackground = true;
+            //thready.Start();
+
+            Task backgroundPeriodicWrite = new Task(BackgroundPeriodicWrite/*, WriteToken*/);
         }
 
         /// <summary>
-        /// Writes all 
+        /// Writes messages to file
         /// </summary>
-        private void BackgroundWrite()
+        private void BackgroundPeriodicWrite()
         {
             while (true)
             {
-                Thread.Sleep(ReleaseTime);
-                lock (Buffer)
-                {
-                    AsyncWrite(Buffer, StorageFile);
-                }
+                Thread.Sleep(ReleaseTime);           
+                WriteMessagesAsync();              
             }
         }
 
@@ -75,38 +96,68 @@ namespace LogBuffer
         /// <param name="Item">Message ot add</param>
         public void Add(string Item)
         {
-            if (Buffer.Count < BufferSize)
-            {
-                lock(Buffer)
-                {
-                    Buffer.Add(Item);
-                }                
-            }
-            else if (Buffer.Count == BufferSize)
-            {
-                AsyncWrite(Buffer, StorageFile);
-            }
+            AppendedMessage = Item;
         }
 
         /// <summary>
-        /// Writes messages from list to file asynchronously
+        /// Calls task to write buffer list to file
         /// </summary>
-        /// <param name="MessageList">List with messages</param>
-        /// <param name="StorageFile">File that will store messages</param>
-        private void AsyncWrite(List<string> MessageList, string StorageFile)
+        private async void WriteMessagesAsync()
         {
-            //if (!File.Exists(StorageFile))
-            //{
-            //    File.Create(StorageFile);
-            //}
-            lock (Buffer)
+            await AsyncWriteTask();
+        }
+
+        /// <summary>
+        /// Writes buffer list to file asyncronously 
+        /// </summary>
+        /// <returns></returns>
+        private Task AsyncWriteTask()
+        {
+            List<string> bufferToWrite = Buffer;
+            Buffer = new List<string>();
+            return Task.Run(() =>
             {
-                foreach (var item in Buffer)
+                lock (StorageFile)
                 {
-                    Console.WriteLine(item);
+                    File.AppendAllLines(StorageFile, bufferToWrite);
+                }
+            });
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                Thread.Sleep(1000);
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
                 }
 
-            }           
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
+
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~LogBuffer() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
