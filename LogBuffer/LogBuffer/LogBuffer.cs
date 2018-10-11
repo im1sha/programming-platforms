@@ -8,8 +8,18 @@ using System.Threading.Tasks;
 
 namespace LogBuffer
 {
-    class LogBuffer:IDisposable
+    class LogBuffer : IDisposable
     {
+        /// <summary>
+        /// Value determines whether Dispose() was called
+        /// </summary>
+        private bool DisposedValue = false;
+
+        /// <summary>
+        /// Object used for locking while writing
+        /// </summary> 
+        private object SynchronousWrite = new object();
+
         /// <summary>
         /// List of messages that should be added 
         /// to file on hard drive
@@ -30,7 +40,10 @@ namespace LogBuffer
                 
                 if (Buffer.Count == BufferSize)
                 {
-                    WriteMessagesAsync();
+                    lock (SynchronousWrite)
+                    {
+                        WriteMessagesAsync();
+                    }                  
                 }
             }
         }
@@ -54,8 +67,11 @@ namespace LogBuffer
 
         private readonly int DefaultBufferSize = 50;
 
-        //CancellationTokenSource WriteTokenSource = new CancellationTokenSource();
-        //CancellationToken WriteToken;
+        private List<Task> RunningTasks = new List<Task>();
+
+        CancellationTokenSource Cts = new CancellationTokenSource();
+
+        CancellationToken Ct;
 
         /// <summary>
         /// Creates imnstance of LogBuffer class
@@ -68,14 +84,39 @@ namespace LogBuffer
             this.BufferSize = (BufferSize > 0) ? BufferSize : DefaultBufferSize;
             this.ReleaseTime = (ReleaseTime > 0) ? ReleaseTime : DefaultReleaseTimeInSeconds;           
             this.StorageFile = StorageFile;
-            //WriteToken = WriteTokenSource.Token;
+            Ct = Cts.Token;
+            Task backgroundPeriodicWrite = new Task(BackgroundPeriodicWrite, Ct);
+        }
 
+        ~LogBuffer()
+        {
+            Dispose(false);
+        }
 
-            //Thread thready = new Thread(BackgroundPeriodicWrite);
-            //thready.IsBackground = true;
-            //thready.Start();
+        /// <summary>
+        /// Finalizes all running works
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            Task backgroundPeriodicWrite = new Task(BackgroundPeriodicWrite/*, WriteToken*/);
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!DisposedValue)
+            {
+                if (disposing)
+                {
+                    Task.WaitAll(RunningTasks.ToArray());
+                    Cts.Cancel();
+                    if (Buffer.Count != 0)
+                    {
+                        File.AppendAllLines(StorageFile, Buffer);
+                    }
+                }
+                DisposedValue = true;
+            }
         }
 
         /// <summary>
@@ -108,56 +149,26 @@ namespace LogBuffer
         }
 
         /// <summary>
-        /// Writes buffer list to file asyncronously 
+        /// Writes buffer list to file 
         /// </summary>
         /// <returns></returns>
         private Task AsyncWriteTask()
         {
-            List<string> bufferToWrite = Buffer;
-            Buffer = new List<string>();
-            return Task.Run(() =>
+            List<string> bufferToWrite;
+            lock (Buffer)
+            {
+                bufferToWrite = Buffer;
+                Buffer = new List<string>();
+            }                       
+            var t = Task.Run(() =>
             {
                 lock (StorageFile)
                 {
                     File.AppendAllLines(StorageFile, bufferToWrite);
                 }
             });
-        }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                Thread.Sleep(1000);
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects).
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~LogBuffer() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
+            RunningTasks.Add(t);
+            return t;
+        }            
     }
 }
