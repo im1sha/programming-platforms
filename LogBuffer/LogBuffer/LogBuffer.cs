@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,11 +13,6 @@ namespace LogBuffer
         /// Value determines whether Dispose() was called
         /// </summary>
         private bool DisposedValue = false;
-
-        /// <summary>
-        /// Object used for locking while writing
-        /// </summary> 
-        private object SynchronousWrite = new object();
 
         /// <summary>
         /// List of messages that should be added 
@@ -40,10 +34,7 @@ namespace LogBuffer
                 
                 if (Buffer.Count == BufferSize)
                 {
-                    lock (SynchronousWrite)
-                    {
-                        WriteMessagesAsync();
-                    }                  
+                    RequestWriting();
                 }
             }
         }
@@ -51,23 +42,28 @@ namespace LogBuffer
         /// <summary>
         /// File that stores messages
         /// </summary>
-        private string StorageFile;
+        private readonly string StorageFile;
 
         /// <summary>
         /// Time between writes on hard drive in ms
         /// </summary>
-        private int ReleaseTime;
+        private readonly int ReleaseTime;
 
         /// <summary>
         /// Buffer capacity 
         /// </summary>
-        private int BufferSize;
+        private readonly int BufferSize;
 
         private readonly int DefaultReleaseTimeInSeconds = 1_000;
 
         private readonly int DefaultBufferSize = 50;
 
         private List<Task> RunningTasks = new List<Task>();
+
+        /// <summary>
+        /// Unique values for task identifying 
+        /// </summary>
+        private List<long> TaskStartTime = new List<long>();
 
         CancellationTokenSource Cts = new CancellationTokenSource();
 
@@ -120,14 +116,14 @@ namespace LogBuffer
         }
 
         /// <summary>
-        /// Writes messages to file
+        /// Writes messages to file 
         /// </summary>
         private void BackgroundPeriodicWrite()
         {
             while (true)
             {
-                Thread.Sleep(ReleaseTime);           
-                WriteMessagesAsync();              
+                Thread.Sleep(ReleaseTime);
+                RequestWriting();
             }
         }
 
@@ -143,32 +139,67 @@ namespace LogBuffer
         /// <summary>
         /// Calls task to write buffer list to file
         /// </summary>
-        private async void WriteMessagesAsync()
+        /// <param name="Time">Time of request to write in binary format</param>
+        private async void WriteMessagesAsync(long Time)
         {
-            await AsyncWriteTask();
+            await AsyncWriteTask(Time);
         }
 
         /// <summary>
         /// Writes buffer list to file 
         /// </summary>
+        /// <param name="Time">Time of request to write in binary format</param>
         /// <returns></returns>
-        private Task AsyncWriteTask()
+        private Task AsyncWriteTask(long Time)
         {
             List<string> bufferToWrite;
             lock (Buffer)
             {
                 bufferToWrite = Buffer;
                 Buffer = new List<string>();
-            }                       
-            var t = Task.Run(() =>
+            }
+            Task t = Task.Run(() =>
             {
-                lock (StorageFile)
+                while (true)
                 {
-                    File.AppendAllLines(StorageFile, bufferToWrite);
+                    lock (TaskStartTime)
+                    {
+                        if (TaskStartTime.Min() == Time)
+                        {
+                            lock (StorageFile)
+                            {
+                                File.AppendAllLines(StorageFile, bufferToWrite);
+                            }
+                            TaskStartTime.Remove(Time);
+                            break;
+                        }
+                    }
                 }
             });
-            RunningTasks.Add(t);
+            RunningTasks.Add(t);       
             return t;
-        }            
+        }
+
+        /// <summary>
+        /// Generates unique time value and requsts for async writing 
+        /// </summary>
+        private void RequestWriting()
+        {
+            long now;
+            lock (TaskStartTime)
+            {
+
+                do
+                {
+                    now = DateTime.Now.ToBinary();
+                    if (!TaskStartTime.Contains(now))
+                    {
+                        TaskStartTime.Add(now);
+                        break;
+                    }
+                } while (true);
+            }
+            WriteMessagesAsync(now);
+        }
     }
 }
