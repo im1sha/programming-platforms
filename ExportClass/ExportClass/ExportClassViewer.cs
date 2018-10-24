@@ -26,17 +26,18 @@ namespace ExportClass
 
             Type[] types = assembly.GetExportedTypes();
 
-            List<Type> requiredTypes = types.Where(
-                type => {
+            List<Type> requiredTypes = (types != null)
+                ? types.Where(type => {
                     try
                     {
                         return Attribute.GetCustomAttribute(type, typeof(ExportClass)) != null;
                     }
-                    catch 
+                    catch
                     {
                         return false;
-                    }                   
-                }).ToList();
+                    }
+                }).ToList()
+                : new List<Type>();
 
             List<string> classInfo = new List<string>();
 

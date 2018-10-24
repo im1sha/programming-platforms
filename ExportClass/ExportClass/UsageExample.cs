@@ -25,10 +25,17 @@ namespace ExportClass
             string libPath = args[0];
            
             List<string> exportClasses = ExportClassViewer.RetrieveExportClasses(libPath);
-
-            foreach (string item in exportClasses)
+            
+            if (exportClasses.Count == 0)
             {
-                Console.WriteLine(item);
+                Console.WriteLine("No items of ExportClass type");
+            }
+            else
+            {
+                foreach (string item in exportClasses)
+                {
+                    Console.WriteLine(item);
+                }
             }
 
             Console.WriteLine("Press any key");

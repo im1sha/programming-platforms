@@ -11,7 +11,7 @@
     }
 
     [ExportClass.ExportClass("NN2", Version = 1.22)]
-    public class F
+    public class C
     {
     }
 
