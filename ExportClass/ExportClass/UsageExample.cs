@@ -21,11 +21,35 @@ namespace ExportClass
             {
                 throw new ArgumentException("Path to library should be passed");
             }
-
             string libPath = args[0];
+
+            TestRetrieveAttributes(libPath);
+
+            // TestRetrieveExportClasses(libPath);
+
+            Console.WriteLine("Press any key");
+            Console.ReadKey();
+        }
+
+        static void TestRetrieveAttributes(string libPath)
+        {
+            Dictionary<Type, Attribute[]> info = AttributeViewer.RetrieveAttributes(libPath);
+            foreach (var data in info)
+            {
+                Console.Write(data.Key + ":\n\t");
+                foreach (var attribute in data.Value)
+                {                    
+                    Console.Write(attribute + "  ");              
+                }
+                Console.WriteLine();
+            }
            
-            List<string> exportClasses = ExportClassViewer.RetrieveExportClasses(libPath);
-            
+        }
+
+        static void TestRetrieveExportClasses(string libPath)
+        {          
+            List<string> exportClasses = AttributeViewer.RetrieveExportClasses(libPath);
+
             if (exportClasses.Count == 0)
             {
                 Console.WriteLine("No items of ExportClass type");
@@ -37,9 +61,6 @@ namespace ExportClass
                     Console.WriteLine(item);
                 }
             }
-
-            Console.WriteLine("Press any key");
-            Console.ReadKey();
         }
     }
 }

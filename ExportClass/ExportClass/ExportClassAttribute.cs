@@ -6,15 +6,15 @@ namespace ExportClass
     /// This attribute stores author name and class version
     /// </summary>
     [System.AttributeUsage(System.AttributeTargets.Class)]
-    public class ExportClass : System.Attribute
+    public class ExportClassAttribute : System.Attribute
     {
         private readonly string AuthorName;
 
         public double Version;
 
-        public ExportClass(string Name)
+        public ExportClassAttribute(string name)
         {
-            AuthorName = Name;
+            AuthorName = name;
             Version = 1.0;
         }
     }
