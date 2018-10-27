@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="ExportClassAttribute.cs" />
     <Compile Include="AttributeViewer.cs" />
+    <Compile Include="MultiAttribute.cs" />
     <Compile Include="UsageExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
