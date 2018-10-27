@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Calculator.Characteristics.cs" />
     <Compile Include="Calculator.Computing.cs" />
     <Compile Include="Calculator.Others.cs" />
     <Compile Include="Calculator.Repair.cs" />

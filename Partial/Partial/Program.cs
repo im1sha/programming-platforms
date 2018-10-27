@@ -10,11 +10,18 @@ namespace Partial
     {
         static void Main(string[] args)
         {
-            Calculator c = new Calculator();
+            Calculator c = new Calculator(10, 20, 30);
             Console.WriteLine("Sum: " + c.ComputeSum(5, 10, 15, 20));
             Console.WriteLine("Can be repared: " + c.Repair(DateTime.Now.ToBinary()));
 
-            Console.WriteLine("Press any key");
+            double[] characteristics = c.GetCharacteristics();
+            Console.Write("Calculator's Height, Width & Weight: ");
+            foreach (var item in characteristics)
+            {
+                Console.Write(item + "  ");
+            }
+
+            Console.WriteLine("\nPress any key");
             Console.ReadKey();
         }
     }
