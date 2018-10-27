@@ -11,11 +11,39 @@ namespace MultifileAssemblyViewer
     {
         static void Main(string[] args)
         {
-            myClient.Client client = new myClient.Client();
-            client.ClientMethod();
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("Path to library should be passed");
+            }
+            string libPath = args[0];
 
-            myStringer.Stringer stringer = new myStringer.Stringer();
-            stringer.StringerMethod();
+            TestRetrieveAttributes(libPath);
+        }
+
+        static void TestRetrieveAttributes(string libPath)
+        {
+            Dictionary<Type, Attribute[]> info = ExportClass.AttributeViewer.RetrieveAttributes(libPath);
+            foreach (var data in info)
+            {
+                Console.Write(data.Key);
+                foreach (var attribute in data.Value)
+                {
+                    Console.Write("\n\t" + attribute);
+                    if (attribute.GetType() == typeof(ExportClass.ExportClassAttribute))
+                    {
+                        Console.Write($" <{((ExportClass.ExportClassAttribute)attribute).Version}> ");
+                    }
+                    if (attribute.GetType() == typeof(ExportClass.MultiAttribute))
+                    {
+                        Console.Write($" <{((ExportClass.MultiAttribute)attribute).Data}> ");
+                    }
+                }
+                if (data.Value.Length == 0)
+                {
+                    Console.Write("\n\tno attributes");
+                }
+                Console.WriteLine();
+            }
 
         }
     }
