@@ -6,9 +6,14 @@ namespace EntryPoint
     {
 		public static void Main(string[]args)
 		{
-			ClassPackage.Math.Sum(5, 10, 15, 20);
+			var sum = ClassPackage.Math.Sum(5, 10, 15, 20);
 			ClassPackage.AssemblyViewer v = new ClassPackage.AssemblyViewer();
-			Console.Write(v.GetCallingAssembly().ToString());
+								
+			System.Console.WriteLine(v.GetCallingAssembly().ToString());
+			System.Console.WriteLine("Sum is {0}\n", sum);
+			System.Console.ReadLine();
+			
+			
 		}
     }
 }
