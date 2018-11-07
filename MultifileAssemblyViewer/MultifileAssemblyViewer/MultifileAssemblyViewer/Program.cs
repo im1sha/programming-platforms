@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 
 namespace MultifileAssemblyViewer
@@ -17,25 +18,26 @@ namespace MultifileAssemblyViewer
             }
             string libPath = args[0];
 
-            TestRetrieveAttributes(libPath);
+            TestAttributesRetrieving(libPath);
         }
 
-        static void TestRetrieveAttributes(string libPath)
+        static void TestAttributesRetrieving(string libPath)
         {
-            Dictionary<Type, Attribute[]> info = ExportClass.AttributeViewer.RetrieveAttributes(libPath);
+            Dictionary<Type, Attribute[]> info = AttributeViewer.Viewer.RetrieveAttributes(libPath);
+
             foreach (KeyValuePair<Type, Attribute[]> data in info)
             {
                 Console.Write(data.Key);
                 foreach (Attribute attribute in data.Value)
                 {
                     Console.Write("\n\t" + attribute);
-                    if (attribute.GetType() == typeof(ExportClass.ExportClassAttribute))
+                    if (attribute.GetType() == typeof(ExportDll.ExportClassAttribute))
                     {
-                        Console.Write($" <{((ExportClass.ExportClassAttribute)attribute).Version}> ");
+                        Console.Write($" <{((ExportDll.ExportClassAttribute)attribute).Version}> ");
                     }
-                    if (attribute.GetType() == typeof(ExportClass.MultiAttribute))
+                    if (attribute.GetType() == typeof(MultiDll.MultiAttribute))
                     {
-                        Console.Write($" <{((ExportClass.MultiAttribute)attribute).Data}> ");
+                        Console.Write($" <{((MultiDll.MultiAttribute)attribute).Data}> ");
                     }
                 }
                 if (data.Value.Length == 0)

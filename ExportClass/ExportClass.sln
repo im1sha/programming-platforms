@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportClass", "ExportClass\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DllCreator", "DllCreator\DllCreator.csproj", "{2D5B07C3-17FF-41E6-92BE-D20ECA957FC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportDll", "ExportDll\ExportDll.csproj", "{DAE37568-7AA4-4E3F-AD81-2B3B247A1BA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportDll", "ExportDll\ExportDll.csproj", "{DAE37568-7AA4-4E3F-AD81-2B3B247A1BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiDll", "MultiDll\MultiDll.csproj", "{4FF1561C-24C6-4424-BA58-BB400E28B30A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MultiDll", "MultiDll\MultiDll.csproj", "{4FF1561C-24C6-4424-BA58-BB400E28B30A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttributeViewer", "AttributeViewer\AttributeViewer.csproj", "{C093548A-A96E-4C82-BAD3-C7A157833353}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{4FF1561C-24C6-4424-BA58-BB400E28B30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FF1561C-24C6-4424-BA58-BB400E28B30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FF1561C-24C6-4424-BA58-BB400E28B30A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C093548A-A96E-4C82-BAD3-C7A157833353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C093548A-A96E-4C82-BAD3-C7A157833353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C093548A-A96E-4C82-BAD3-C7A157833353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C093548A-A96E-4C82-BAD3-C7A157833353}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

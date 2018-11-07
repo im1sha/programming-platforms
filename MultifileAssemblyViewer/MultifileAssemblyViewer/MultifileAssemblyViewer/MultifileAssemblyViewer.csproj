@@ -33,8 +33,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExportClass">
-      <HintPath>..\..\..\ExportClass\ExportClass\bin\Debug\ExportClass.exe</HintPath>
+    <Reference Include="AttributeViewer">
+      <HintPath>..\..\..\ExportClass\AttributeViewer\bin\Debug\netstandard2.0\AttributeViewer.dll</HintPath>
+    </Reference>
+    <Reference Include="ExportDll, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\ExportClass\ExportDll\bin\Debug\netstandard1.4\ExportDll.dll</HintPath>
+    </Reference>
+    <Reference Include="MultiDll">
+      <HintPath>..\..\..\ExportClass\MultiDll\bin\Debug\netstandard1.4\MultiDll.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

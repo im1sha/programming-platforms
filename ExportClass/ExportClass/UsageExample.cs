@@ -31,7 +31,7 @@ namespace ExportClass
 
         static void TestRetrieveExportClasses(string libPath)
         {          
-            List<string> exportClasses = AttributeViewer.RetrieveExportClasses(libPath);
+            List<string> exportClasses = AttributeViewer.Viewer.RetrieveExportClasses(libPath);
 
             if (exportClasses.Count == 0)
             {

@@ -6,9 +6,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExportClass
+/// <summary>
+/// WARNING! .NET Core 2.0.0 required 
+/// https://github.com/dotnet/core/blob/master/release-notes/download-archives/2.0.0-download.md 
+/// </summary>
+namespace AttributeViewer
 {
-    public static class AttributeViewer
+    public static class Viewer
     {
         /// <summary>
         /// Retrieves all classes marked with ExportClass attribute
@@ -78,6 +82,4 @@ namespace ExportClass
             return result;
         }
     }
-
-
 }

@@ -49,12 +49,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AttributeViewer.cs" />
     <Compile Include="UsageExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AttributeViewer\AttributeViewer.csproj">
+      <Project>{c093548a-a96e-4c82-bad3-c7a157833353}</Project>
+      <Name>AttributeViewer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DllCreator\DllCreator.csproj">
+      <Project>{2d5b07c3-17ff-41e6-92be-d20eca957fc5}</Project>
+      <Name>DllCreator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
