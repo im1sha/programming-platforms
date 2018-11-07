@@ -30,7 +30,7 @@ namespace ExportClass
                 ? types.Where(type => {
                     try
                     {
-                        return Attribute.GetCustomAttribute(type, typeof(ExportClassAttribute)) != null;
+                        return Attribute.GetCustomAttribute(type, typeof(ExportDll.ExportClassAttribute)) != null;
                     }
                     catch
                     {

@@ -23,10 +23,10 @@ namespace MultifileAssemblyViewer
         static void TestRetrieveAttributes(string libPath)
         {
             Dictionary<Type, Attribute[]> info = ExportClass.AttributeViewer.RetrieveAttributes(libPath);
-            foreach (var data in info)
+            foreach (KeyValuePair<Type, Attribute[]> data in info)
             {
                 Console.Write(data.Key);
-                foreach (var attribute in data.Value)
+                foreach (Attribute attribute in data.Value)
                 {
                     Console.Write("\n\t" + attribute);
                     if (attribute.GetType() == typeof(ExportClass.ExportClassAttribute))

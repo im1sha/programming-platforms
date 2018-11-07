@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExportDll">
+      <HintPath>..\ExportDll\bin\Debug\netstandard1.4\ExportDll.dll</HintPath>
+    </Reference>
+    <Reference Include="MultiDll">
+      <HintPath>..\MultiDll\bin\Debug\netstandard1.4\MultiDll.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,9 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExportClassAttribute.cs" />
     <Compile Include="AttributeViewer.cs" />
-    <Compile Include="MultiAttribute.cs" />
     <Compile Include="UsageExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

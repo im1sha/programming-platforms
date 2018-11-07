@@ -5,11 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ExportClass\ExportClass.csproj" />
+    <Reference Include="ExportDll">
+      <HintPath>..\ExportDll\bin\Debug\netstandard1.4\ExportDll.dll</HintPath>
+    </Reference>
+    <Reference Include="MultiDll">
+      <HintPath>..\MultiDll\bin\Debug\netstandard1.4\MultiDll.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ExportClass
+namespace ExportDll
 {
     /// <summary>
     /// This attribute stores author name and class version

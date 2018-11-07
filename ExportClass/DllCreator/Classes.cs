@@ -4,26 +4,26 @@
     {
     }
 
-    [ExportClass.ExportClassAttribute("A.B.C.",Version = 1.0)]
+    [ExportDll.ExportClassAttribute("A.B.C.",Version = 1.0)]
     public class A
     {
     }
 
-    [ExportClass.MultiAttribute("A")]
-    [ExportClass.MultiAttribute("B")]
-    [ExportClass.MultiAttribute("X")]
-    [ExportClass.ExportClassAttribute("NN", Version = 1.2)]
+    [MultiDll.MultiAttribute("A")]
+    [MultiDll.MultiAttribute("B")]
+    [MultiDll.MultiAttribute("X")]
+    [ExportDll.ExportClassAttribute("NN", Version = 1.2)]
     class B
     {
     }
 
-    [ExportClass.MultiAttribute("C")]
-    [ExportClass.ExportClassAttribute("NN2", Version = 1.22)]
+    [MultiDll.MultiAttribute("C")]
+    [ExportDll.ExportClassAttribute("NN2", Version = 1.22)]
     public class C
     {
     }
 
-    [ExportClass.MultiAttribute("D")]
+    [MultiDll.MultiAttribute("D")]
     public class D
     {
     }
